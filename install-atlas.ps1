@@ -7,11 +7,11 @@
 #   Oder Rechtsklick -> "Mit PowerShell ausfuehren"
 # ============================================================
 
-# ---- KONFIGURATION - vor Upload zu GitHub anpassen! -----
-$GithubUser  = "DEIN_USERNAME"
+# ---- KONFIGURATION ----
+$GithubUser  = "Carrotix007"
 $GithubRepo  = "atlas"
 $ReleaseTag  = "latest"  # oder z.B. "v1.0"
-# ---------------------------------------------------------
+# -----------------------
 
 $InstallDir = Join-Path $env:LOCALAPPDATA "ATLAS"
 $ZipUrl     = if ($ReleaseTag -eq "latest") {
