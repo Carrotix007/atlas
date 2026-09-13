@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Display Helper</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a1a;
+    color: #c8c8e0;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ═══════════════════════════════════════
+     DECOY PAGE — Display Helper
+     ═══════════════════════════════════════ */
+
+  .decoy-container {
+    background: linear-gradient(135deg, #0d0d2b 0%, #141432 50%, #0d0d2b 100%);
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .decoy-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, rgba(40, 100, 200, 0.25) 0%, rgba(15, 12, 40, 0.8) 100%);
+    border-bottom: 1px solid rgba(40, 100, 200, 0.2);
+    position: relative;
+    cursor: grab;
+    flex-shrink: 0;
+    gap: 10px;
+  }
+  .decoy-header:active { cursor: grabbing; }
+
+  .decoy-logo {
+    font-size: 18px;
+    cursor: default;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .decoy-logo:active { background: rgba(40, 100, 200, 0.15); }
+
+  .decoy-header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #90b8e0;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  .decoy-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .decoy-scroll::-webkit-scrollbar { display: none; }
+
+  .d-section {
+    margin: 10px;
+    background: rgba(15, 12, 40, 0.6);
+    border: 1px solid rgba(40, 100, 200, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .d-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(40, 100, 200, 0.2) 0%, rgba(40, 100, 200, 0.03) 100%);
+    border-bottom: 1px solid rgba(40, 100, 200, 0.15);
+  }
+  .d-section-header .icon { font-size: 14px; opacity: 0.7; }
+  .d-section-header h2 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #6898d0;
+  }
+
+  .d-section-body {
+    padding: 10px 12px;
+  }
+
+  .d-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .d-info-item {
+    padding: 8px 10px;
+    background: rgba(20, 30, 60, 0.5);
+    border: 1px solid rgba(40, 100, 200, 0.1);
+    border-radius: 6px;
+  }
+  .d-info-item .label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5878a0;
+    margin-bottom: 4px;
+  }
+  .d-info-item .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #a0c0e8;
+  }
+  .d-info-item .value.good { color: #60d080; }
+
+  .d-bar-wrap {
+    margin-top: 10px;
+  }
+  .d-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #5878a0;
+    margin-bottom: 4px;
+  }
+  .d-bar-track {
+    height: 6px;
+    background: rgba(20, 30, 60, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(40, 100, 200, 0.1);
+  }
+  .d-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  .d-color-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .d-color-swatch {
+    flex: 1;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid rgba(40, 100, 200, 0.15);
+  }
+
+  .d-status-bar {
+    padding: 8px 16px;
+    border-top: 1px solid rgba(40, 100, 200, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: #5a5078;
+    flex-shrink: 0;
+  }
+  .d-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #40a0e0;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 6px rgba(40, 160, 220, 0.4);
+  }
+
+  /* ═══════════════════════════════════════
+     ATLAS PAGE — Cleaner (hidden by default)
+     ═══════════════════════════════════════ */
+
+  .atlas-container {
+    background: linear-gradient(135deg, #0d0d2b 0%, #141432 50%, #0d0d2b 100%);
+    width: 100%;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .atlas-container.active { display: flex; }
+  .decoy-container.hidden { display: none; }
+
+  .atlas-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .atlas-scroll::-webkit-scrollbar { display: none; }
+
+  .atlas-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, rgba(80, 40, 180, 0.25) 0%, rgba(15, 12, 40, 0.8) 100%);
+    border-bottom: 1px solid rgba(100, 60, 200, 0.2);
+    position: relative;
+    cursor: grab;
+    flex-shrink: 0;
+  }
+  .atlas-header:active { cursor: grabbing; }
+
+  .atlas-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #b8a0f0;
+    text-shadow: 0 0 20px rgba(140, 80, 255, 0.4);
+    pointer-events: none;
+  }
+
+  .window-controls {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 6px;
+  }
+
+  .win-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(100, 60, 200, 0.2);
+    border-radius: 6px;
+    background: rgba(30, 20, 60, 0.6);
+    color: #8070a0;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1;
+  }
+  .win-btn:hover {
+    background: rgba(80, 40, 180, 0.3);
+    color: #d0c0f0;
+    border-color: rgba(140, 90, 240, 0.4);
+  }
+  .win-btn.close-btn:hover {
+    background: rgba(200, 40, 40, 0.4);
+    color: #ff8888;
+    border-color: rgba(220, 60, 60, 0.5);
+  }
+
+  .section {
+    margin: 10px;
+    background: rgba(15, 12, 40, 0.6);
+    border: 1px solid rgba(100, 60, 200, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(80, 40, 180, 0.25) 0%, rgba(80, 40, 180, 0.05) 100%);
+    border-bottom: 1px solid rgba(100, 60, 200, 0.15);
+  }
+
+  .section-header .icon { font-size: 14px; opacity: 0.7; }
+
+  .section-header h2 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #a888e8;
+  }
+
+  .section-header .tag {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .section-body {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .btn {
+    background: linear-gradient(135deg, #4a2d8a 0%, #3a2070 100%);
+    border: 1px solid rgba(120, 70, 220, 0.3);
+    color: #d0c0f0;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background: linear-gradient(135deg, #5a3da0 0%, #4a2d8a 100%);
+    border-color: rgba(140, 90, 240, 0.5);
+    box-shadow: 0 0 12px rgba(100, 60, 220, 0.3);
+    color: #fff;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .section.stealth-section {
+    border-color: rgba(60, 200, 120, 0.2);
+  }
+  .section.stealth-section .section-header {
+    background: linear-gradient(90deg, rgba(40, 160, 80, 0.2) 0%, rgba(40, 160, 80, 0.03) 100%);
+    border-bottom-color: rgba(60, 200, 120, 0.15);
+  }
+  .section.stealth-section .section-header h2 { color: #60d080; }
+
+  .btn.stealth {
+    background: linear-gradient(135deg, #1a5a30 0%, #0f3a1e 100%);
+    border-color: rgba(60, 200, 100, 0.3);
+  }
+  .btn.stealth:hover {
+    background: linear-gradient(135deg, #227040 0%, #1a5a30 100%);
+    border-color: rgba(80, 220, 120, 0.5);
+    box-shadow: 0 0 12px rgba(60, 200, 100, 0.3);
+    color: #fff;
+  }
+  .btn.stealth.primary {
+    background: linear-gradient(135deg, #28804a 0%, #1a5a30 100%);
+    font-size: 13px;
+    padding: 10px 16px;
+    font-weight: 600;
+  }
+  .btn.stealth.primary:hover {
+    background: linear-gradient(135deg, #30a058 0%, #28804a 100%);
+    box-shadow: 0 0 20px rgba(60, 200, 100, 0.4);
+  }
+
+  .btn.echo {
+    background: linear-gradient(135deg, #5a3a10 0%, #3a2508 100%);
+    border-color: rgba(200, 140, 40, 0.3);
+  }
+  .btn.echo:hover {
+    background: linear-gradient(135deg, #6a4a18 0%, #5a3a10 100%);
+    border-color: rgba(220, 160, 60, 0.5);
+    box-shadow: 0 0 12px rgba(200, 140, 40, 0.3);
+    color: #fff;
+  }
+  .ad-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+  }
+
+  .ad-status {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #4a8a5a;
+    padding: 6px 10px;
+    background: rgba(40, 120, 60, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(60, 200, 100, 0.1);
+    min-height: 20px;
+  }
+
+  .ad-divider {
+    border: none;
+    border-top: 1px solid rgba(60, 200, 100, 0.1);
+    margin: 6px 0;
+  }
+  .echo-divider {
+    border: none;
+    border-top: 1px solid rgba(200, 140, 40, 0.1);
+    margin: 6px 0;
+  }
+
+  .ad-label {
+    font-size: 10px;
+    color: #5a9a6a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .echo-label {
+    font-size: 10px;
+    color: #a08030;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .self-divider {
+    border: none;
+    border-top: 1px solid rgba(160, 80, 255, 0.15);
+    margin: 6px 0;
+  }
+  .self-label {
+    font-size: 10px;
+    color: #9070c0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+
+  .checkbox-wrap input[type="checkbox"] {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(60, 200, 100, 0.4);
+    border-radius: 3px;
+    background: rgba(20, 15, 50, 0.8);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .checkbox-wrap input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, #28804a, #1a5a30);
+    border-color: #40c060;
+  }
+
+  .checkbox-wrap input[type="checkbox"]:checked::after {
+    content: '\2713';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .checkbox-wrap label {
+    font-size: 11px;
+    cursor: pointer;
+    color: #b0a8d0;
+  }
+
+  .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+  .status-bar {
+    padding: 8px 16px;
+    border-top: 1px solid rgba(100, 60, 200, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: #5a5078;
+    flex-shrink: 0;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #40c060;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 6px rgba(60, 200, 80, 0.4);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, #1a5a30, #28804a);
+    border: 1px solid rgba(60, 200, 100, 0.4);
+    color: #d0f0d8;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(30, 100, 50, 0.4);
+    z-index: 100;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .btn.stealth-self {
+    background: linear-gradient(135deg, #3a1a80 0%, #2a1060 100%);
+    border-color: rgba(160, 80, 255, 0.3);
+  }
+  .btn.stealth-self:hover {
+    background: linear-gradient(135deg, #4a2a98 0%, #3a1a80 100%);
+    border-color: rgba(180, 100, 255, 0.5);
+    box-shadow: 0 0 12px rgba(140, 60, 240, 0.3);
+    color: #fff;
+  }
+  .warn-text {
+    font-size: 9px;
+    color: #a08030;
+    line-height: 1.4;
+    padding: 4px 0;
+  }
+
+  /* ── Tab System ── */
+  .tab-bar {
+    display: flex;
+    background: rgba(15, 12, 40, 0.8);
+    border-bottom: 1px solid rgba(100, 60, 200, 0.15);
+    padding: 0 8px;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+  .tab {
+    padding: 8px 14px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #706090;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    user-select: none;
+  }
+  .tab:hover {
+    color: #b8a0f0;
+    background: rgba(80, 40, 180, 0.08);
+  }
+  .tab.active {
+    color: #d0c0f0;
+    border-bottom-color: #8858ff;
+    background: rgba(80, 40, 180, 0.12);
+  }
+  .tab-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tab-panel {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tab-panel.active {
+    display: flex;
+  }
+
+  /* ── Log Panel ── */
+  .log-toolbar {
+    display: flex;
+    padding: 8px 12px;
+    gap: 6px;
+    align-items: center;
+    background: rgba(15, 12, 40, 0.5);
+    border-bottom: 1px solid rgba(100, 60, 200, 0.1);
+    flex-shrink: 0;
+  }
+  .log-toolbar .info {
+    font-size: 10px;
+    color: #7060a0;
+    margin-left: auto;
+  }
+  .log-view {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11px;
+    background: rgba(5, 5, 15, 0.4);
+    scrollbar-width: thin;
+  }
+  .log-view::-webkit-scrollbar { width: 6px; }
+  .log-view::-webkit-scrollbar-thumb { background: rgba(100, 60, 200, 0.3); border-radius: 3px; }
+  .log-line {
+    padding: 1px 4px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #8898b8;
+  }
+  .log-line.info { color: #6098d0; }
+  .log-line.ok   { color: #60d080; }
+  .log-line.warn { color: #e0c040; }
+  .log-line.err  { color: #e07888; }
+  .log-line.raw  { color: #7080a0; }
+  .log-line.sys  { color: #a888e8; font-weight: 600; }
+  .log-line.del  { color: #706890; opacity: 0.85; padding-left: 16px; }
+  .log-empty {
+    color: #504868;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+  }
+
+  /* ── Scanner Panel ── */
+  .scanner-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    scrollbar-width: none;
+  }
+  .scanner-body::-webkit-scrollbar { display: none; }
+
+  .scan-header-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .btn.scan {
+    background: linear-gradient(135deg, #10508a 0%, #082e5a 100%);
+    border-color: rgba(60, 140, 220, 0.3);
+    font-size: 12px;
+    padding: 8px 14px;
+    font-weight: 600;
+  }
+  .btn.scan:hover {
+    background: linear-gradient(135deg, #1770b0 0%, #10508a 100%);
+    box-shadow: 0 0 12px rgba(60, 140, 220, 0.3);
+    color: #fff;
+  }
+
+  .scan-summary {
+    padding: 10px 12px;
+    background: rgba(15, 12, 40, 0.6);
+    border: 1px solid rgba(60, 140, 220, 0.15);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: #a0b8d0;
+  }
+  .scan-summary .big {
+    font-size: 20px;
+    font-weight: 700;
+    display: block;
+    margin-top: 4px;
+  }
+  .scan-summary .big.clean { color: #60d080; }
+  .scan-summary .big.found { color: #e07888; }
+
+  .scan-cat {
+    background: rgba(15, 12, 40, 0.6);
+    border: 1px solid rgba(100, 60, 200, 0.15);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .scan-cat-head {
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .scan-cat-head:hover { background: rgba(80, 40, 180, 0.08); }
+  .scan-cat-name { font-size: 11px; color: #b0a8d0; font-weight: 500; }
+  .scan-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .scan-badge.clean { background: rgba(60, 200, 100, 0.2); color: #60d080; }
+  .scan-badge.found { background: rgba(220, 80, 80, 0.2); color: #e07888; }
+  .scan-cat-body {
+    display: none;
+    padding: 6px 12px 10px;
+    border-top: 1px solid rgba(100, 60, 200, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    font-family: 'Consolas', monospace;
+    font-size: 10px;
+    color: #8898b8;
+  }
+  .scan-cat.open .scan-cat-body { display: block; }
+  .scan-item { padding: 2px 0; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     DECOY PAGE — Display Helper
+     ═══════════════════════════════════════ -->
+<div class="decoy-container" id="decoy-page">
+  <div class="decoy-header" id="decoy-titlebar">
+    <span class="decoy-logo" id="decoy-logo">&#x1F4BB;</span>
+    <h1>Display Helper</h1>
+    <div class="window-controls">
+      <button class="win-btn" onclick="winAction('minimize')" title="Minimieren" style="border-color:rgba(40,100,200,0.2);background:rgba(15,25,50,0.6);color:#6088b0;">&#x2500;</button>
+      <button class="win-btn" onclick="winAction('maximize')" title="Maximieren" style="border-color:rgba(40,100,200,0.2);background:rgba(15,25,50,0.6);color:#6088b0;">&#x25A2;</button>
+      <button class="win-btn close-btn" onclick="winAction('close')" title="Schliessen" style="border-color:rgba(40,100,200,0.2);background:rgba(15,25,50,0.6);color:#6088b0;">&#x2715;</button>
+    </div>
+  </div>
+
+  <div class="decoy-scroll">
+    <div class="d-section">
+      <div class="d-section-header">
+        <span class="icon">&#x1F5B5;</span>
+        <h2>Monitor Info</h2>
+      </div>
+      <div class="d-section-body">
+        <div class="d-info-grid">
+          <div class="d-info-item">
+            <div class="label">Aufloesung</div>
+            <div class="value" id="d-resolution">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Fenster</div>
+            <div class="value" id="d-window">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Farbtiefe</div>
+            <div class="value" id="d-colordepth">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Pixel Ratio</div>
+            <div class="value" id="d-dpr">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Verfuegbar</div>
+            <div class="value" id="d-avail">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Orientation</div>
+            <div class="value" id="d-orientation">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-section">
+      <div class="d-section-header">
+        <span class="icon">&#x1F3A8;</span>
+        <h2>Farbprofil</h2>
+      </div>
+      <div class="d-section-body">
+        <div class="d-info-grid">
+          <div class="d-info-item">
+            <div class="label">Farbraum</div>
+            <div class="value good" id="d-colorspace">sRGB</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">HDR</div>
+            <div class="value" id="d-hdr">-</div>
+          </div>
+        </div>
+        <div class="d-bar-wrap">
+          <div class="d-bar-label"><span>Gamma-Kalibrierung</span><span id="d-gamma-val">2.2</span></div>
+          <div class="d-bar-track">
+            <div class="d-bar-fill" id="d-gamma-bar" style="width:88%;background:linear-gradient(90deg,#2070d0,#40c0f0);"></div>
+          </div>
+        </div>
+        <div class="d-bar-wrap">
+          <div class="d-bar-label"><span>Farbgenauigkeit</span><span id="d-accuracy-val">96%</span></div>
+          <div class="d-bar-track">
+            <div class="d-bar-fill" id="d-accuracy-bar" style="width:96%;background:linear-gradient(90deg,#20a060,#60e0a0);"></div>
+          </div>
+        </div>
+        <div class="d-color-row">
+          <div class="d-color-swatch" style="background:#ff0000;"></div>
+          <div class="d-color-swatch" style="background:#00ff00;"></div>
+          <div class="d-color-swatch" style="background:#0000ff;"></div>
+          <div class="d-color-swatch" style="background:#ffffff;"></div>
+          <div class="d-color-swatch" style="background:#808080;"></div>
+          <div class="d-color-swatch" style="background:#000000;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-section">
+      <div class="d-section-header">
+        <span class="icon">&#x26A1;</span>
+        <h2>Performance</h2>
+      </div>
+      <div class="d-section-body">
+        <div class="d-info-grid">
+          <div class="d-info-item">
+            <div class="label">GPU Renderer</div>
+            <div class="value" id="d-gpu" style="font-size:11px;">-</div>
+          </div>
+          <div class="d-info-item">
+            <div class="label">Hardware Accel.</div>
+            <div class="value good" id="d-hwaccel">Aktiv</div>
+          </div>
+        </div>
+        <div class="d-bar-wrap">
+          <div class="d-bar-label"><span>Render Performance</span><span id="d-perf-val">-</span></div>
+          <div class="d-bar-track">
+            <div class="d-bar-fill" id="d-perf-bar" style="width:0%;background:linear-gradient(90deg,#d06020,#f0a040);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-status-bar">
+    <div><span class="d-status-dot"></span>Monitoring aktiv</div>
+    <div>Display Helper v2.1</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ATLAS PAGE — Cleaner (hidden)
+     ═══════════════════════════════════════ -->
+<div class="atlas-container" id="atlas-page">
+  <div class="atlas-header" id="titlebar">
+    <h1>&#x2B21; ATLAS</h1>
+    <div class="window-controls">
+      <button class="win-btn" onclick="winAction('minimize')" title="Minimieren">&#x2500;</button>
+      <button class="win-btn" onclick="winAction('maximize')" title="Maximieren">&#x25A2;</button>
+      <button class="win-btn close-btn" onclick="winAction('close')" title="Schliessen">&#x2715;</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab active" data-tab="cleaner" onclick="switchTab('cleaner')">Cleaner</div>
+    <div class="tab" data-tab="log" onclick="switchTab('log')">Log</div>
+    <div class="tab" data-tab="scanner" onclick="switchTab('scanner')">Scanner</div>
+  </div>
+
+  <div class="tab-content">
+
+  <div class="tab-panel active" data-panel="cleaner">
+  <div class="atlas-scroll">
+
+  <div class="section stealth-section">
+    <div class="section-header">
+      <span class="icon">&#x1F6E1;</span>
+      <h2>Anti-Forensik</h2>
+      <span class="tag" style="background:rgba(60,200,120,0.2);color:#60d080;">PCCheck</span>
+      <span class="tag" style="background:rgba(200,140,40,0.2);color:#d0a040;">Echo.ac</span>
+    </div>
+    <div class="section-body">
+      <button class="btn stealth primary" onclick="exec('ad-full')" style="width:100%;">Full Clean (Alles)</button>
+
+      <hr class="ad-divider">
+      <span class="ad-label">PCCheck</span>
+
+      <div class="ad-grid">
+        <button class="btn stealth" onclick="exec('ad-quick')">Quick Clean</button>
+        <button class="btn stealth" onclick="exec('ad-files')">Files</button>
+        <button class="btn stealth" onclick="exec('ad-registry')">Registry</button>
+        <button class="btn stealth" onclick="exec('ad-logs')">Event Logs</button>
+        <button class="btn stealth" onclick="exec('ad-prefetch')">Prefetch</button>
+        <button class="btn stealth" onclick="exec('ad-processes')">Processes</button>
+        <button class="btn stealth" onclick="exec('ad-network')">Network</button>
+        <button class="btn stealth" onclick="exec('ad-recent')">Recent Items</button>
+        <button class="btn stealth" onclick="exec('ad-history')">PS History</button>
+      </div>
+
+      <hr class="echo-divider">
+      <span class="echo-label">Echo.ac &#x2014; NTFS Deep Artifacts</span>
+
+      <div class="ad-grid">
+        <button class="btn echo" onclick="exec('echo-usn')">USN Journal</button>
+        <button class="btn echo" onclick="exec('echo-amcache')">Amcache</button>
+        <button class="btn echo" onclick="exec('echo-shimcache')">ShimCache</button>
+        <button class="btn echo" onclick="exec('echo-srum')">SRUM</button>
+        <button class="btn echo" onclick="exec('echo-bam')">BAM/DAM</button>
+        <button class="btn echo" onclick="exec('echo-timeline')">Timeline</button>
+        <button class="btn echo" onclick="exec('echo-freespace')">Free Space</button>
+      </div>
+
+      <hr class="echo-divider">
+      <span class="echo-label">detect.ac &#x2014; Startup / USB / Crashes</span>
+
+      <div class="ad-grid">
+        <button class="btn echo" onclick="exec('detect-autoruns')">Autoruns</button>
+        <button class="btn echo" onclick="exec('detect-usb')">USB History</button>
+        <button class="btn echo" onclick="exec('detect-errors')">Crash Dumps</button>
+      </div>
+
+      <hr class="echo-divider">
+      <span class="echo-label">Last Activity View Counters</span>
+
+      <div class="ad-grid">
+        <button class="btn echo" onclick="exec('lav-userassist')">UserAssist</button>
+        <button class="btn echo" onclick="exec('lav-muicache')">MUICache</button>
+        <button class="btn echo" onclick="exec('lav-rdp')">RDP History</button>
+        <button class="btn echo" onclick="exec('lav-comdlg')">File-Dialog MRUs</button>
+        <button class="btn echo" onclick="exec('lav-search')">Search History</button>
+        <button class="btn echo" onclick="exec('lav-notifications')">Notifications</button>
+        <button class="btn echo" onclick="exec('lav-pca')">PCA Logs</button>
+        <button class="btn echo" onclick="exec('lav-cloud')">Cloud-Drive Logs</button>
+        <button class="btn echo" onclick="exec('lav-shellbags')" title="AGGRESSIV - reset komplett">Shell Bags</button>
+      </div>
+
+      <hr class="self-divider">
+      <span class="self-label">Stealth &#x2014; Eigene Spuren</span>
+
+      <button class="btn stealth-self" onclick="exec('stealth-self')" style="width:100%;">ATLAS-Spuren entfernen</button>
+
+      <button class="btn" onclick="exec('repair')" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#7a4020 0%,#5a3010 100%);border-color:rgba(220,140,60,0.4);">&#x1F527; Services reparieren (Notfall)</button>
+
+      <div class="ad-status" id="ad-status">Bereit.</div>
+      <p class="warn-text">Echo.ac Module + Free Space brauchen Admin-Rechte und Zeit. Stealth laeuft bei Full Clean automatisch mit.</p>
+    </div>
+  </div>
+
+  <div class="section" style="border-color: rgba(100, 60, 200, 0.15);">
+    <div class="section-header">
+      <span class="icon">&#x2699;</span>
+      <h2>Optionen</h2>
+    </div>
+    <div class="section-body">
+      <div class="row">
+        <label class="checkbox-wrap">
+          <input type="checkbox" data-id="auto-clean" id="auto-clean">
+          <label for="auto-clean">Auto-Clean beim Schliessen</label>
+        </label>
+      </div>
+      <div class="row" style="align-items:center;gap:8px;">
+        <button class="btn" onclick="requestAdmin()" id="admin-btn" style="flex-shrink:0;">Admin-Modus</button>
+        <span class="warn-text" style="color:#8070a0;margin:0;">Tiefere Reinigung &#x2014; startet mit UAC-Rechten neu</span>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  </div>
+
+  <div class="tab-panel" data-panel="log">
+    <div class="log-toolbar">
+      <button class="btn" style="font-size:10px;padding:4px 10px;" onclick="clearLog()">Log leeren</button>
+      <label class="checkbox-wrap" style="margin-left:8px;">
+        <input type="checkbox" id="auto-scroll" checked>
+        <label for="auto-scroll" style="color:#8090b8;">Auto-Scroll</label>
+      </label>
+      <span class="info" id="log-info">0 Zeilen</span>
+    </div>
+    <div class="log-view" id="log-view">
+      <div class="log-empty">Noch keine Ausgabe. Starte einen Clean im Cleaner-Tab.</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-panel="scanner">
+    <div class="scanner-body">
+      <div class="scan-header-row">
+        <button class="btn scan" onclick="runScan()">PCCheck Scan starten</button>
+        <span style="font-size:10px;color:#7080a0;">Simuliert was PCCheck finden wuerde &#x2014; loescht nichts.</span>
+      </div>
+      <div id="scan-results">
+        <div class="log-empty">Noch kein Scan durchgefuehrt.</div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="status-bar">
+    <div><span class="status-dot"></span>Connected</div>
+    <div>ATLAS v5.0</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ═══════════════════════════════════════
+  //  DECOY LOGO — 5x click to unlock ATLAS
+  // ═══════════════════════════════════════
+  let logoClicks = 0;
+  let logoTimer = null;
+
+  document.getElementById('decoy-logo').addEventListener('click', function(e) {
+    e.stopPropagation();
+    logoClicks++;
+    clearTimeout(logoTimer);
+
+    if (logoClicks >= 5) {
+      logoClicks = 0;
+      document.getElementById('decoy-page').classList.add('hidden');
+      document.getElementById('atlas-page').classList.add('active');
+    } else {
+      logoTimer = setTimeout(function() { logoClicks = 0; }, 1500);
+    }
+  });
+
+  // ═══════════════════════════════════════
+  //  DECOY — Fill monitor info with real data
+  // ═══════════════════════════════════════
+  function updateDecoyInfo() {
+    document.getElementById('d-resolution').textContent = screen.width + ' x ' + screen.height;
+    document.getElementById('d-window').textContent = window.innerWidth + ' x ' + window.innerHeight;
+    document.getElementById('d-colordepth').textContent = screen.colorDepth + ' Bit';
+    document.getElementById('d-dpr').textContent = window.devicePixelRatio + 'x';
+    document.getElementById('d-avail').textContent = screen.availWidth + ' x ' + screen.availHeight;
+    document.getElementById('d-orientation').textContent = (window.innerWidth > window.innerHeight) ? 'Landscape' : 'Portrait';
+
+    var hdr = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
+    document.getElementById('d-hdr').textContent = hdr ? 'Unterstuetzt' : 'Standard (SDR)';
+    document.getElementById('d-hdr').className = 'value' + (hdr ? ' good' : '');
+
+    try {
+      var canvas = document.createElement('canvas');
+      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (gl) {
+        var ext = gl.getExtension('WEBGL_debug_renderer_info');
+        if (ext) {
+          document.getElementById('d-gpu').textContent = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+        }
+      }
+    } catch(e) {}
+
+    var t0 = performance.now();
+    var c2 = document.createElement('canvas');
+    c2.width = 800; c2.height = 600;
+    var ctx = c2.getContext('2d');
+    for (var i = 0; i < 500; i++) {
+      ctx.fillStyle = 'rgb(' + (i%256) + ',100,150)';
+      ctx.fillRect(Math.random()*800, Math.random()*600, 20, 20);
+    }
+    var elapsed = performance.now() - t0;
+    var score = Math.min(100, Math.round(100 - elapsed));
+    if (score < 0) score = Math.round(Math.random() * 20 + 70);
+    document.getElementById('d-perf-val').textContent = score + '%';
+    document.getElementById('d-perf-bar').style.width = score + '%';
+  }
+
+  updateDecoyInfo();
+  window.addEventListener('resize', updateDecoyInfo);
+
+  // ═══════════════════════════════════════
+  //  WINDOW CONTROLS (shared)
+  // ═══════════════════════════════════════
+  function winAction(action) {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'window', action: action }));
+    } else if (action === 'close') {
+      window.close();
+    }
+  }
+
+  // Drag for decoy titlebar
+  document.getElementById('decoy-titlebar').addEventListener('mousedown', function(e) {
+    if (e.target.closest('.window-controls')) return;
+    if (e.target.id === 'decoy-logo') return;
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'window', action: 'drag' }));
+    }
+  });
+
+  // Drag for atlas titlebar
+  document.getElementById('titlebar').addEventListener('mousedown', function(e) {
+    if (e.target.closest('.window-controls')) return;
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'window', action: 'drag' }));
+    }
+  });
+
+  document.getElementById('titlebar').addEventListener('dblclick', function(e) {
+    if (e.target.closest('.window-controls')) return;
+    winAction('maximize');
+  });
+
+  document.getElementById('decoy-titlebar').addEventListener('dblclick', function(e) {
+    if (e.target.closest('.window-controls')) return;
+    if (e.target.id === 'decoy-logo') return;
+    winAction('maximize');
+  });
+
+  // ═══════════════════════════════════════
+  //  ATLAS — Script execution
+  // ═══════════════════════════════════════
+  const scripts = {
+    'ad-full':      function() { runPS('scripts\\clean-full.ps1', ''); },
+    'ad-quick':     function() { runPS('scripts\\clean-quick.ps1', ''); },
+    'ad-files':     function() { runPS('scripts\\clean-files.ps1', ''); },
+    'ad-registry':  function() { runPS('scripts\\clean-registry-all.ps1', ''); },
+    'ad-logs':      function() { runPS('scripts\\clean-logs-all.ps1', ''); },
+    'ad-prefetch':  function() { runPS('scripts\\clean-prefetch.ps1', ''); },
+    'ad-processes': function() { runPS('scripts\\clean-processes.ps1', ''); },
+    'ad-network':   function() { runPS('scripts\\clean-network.ps1', ''); },
+    'ad-recent':    function() { runPS('scripts\\clean-recent.ps1', ''); },
+    'ad-history':   function() { runPS('scripts\\clean-history.ps1', ''); },
+    'echo-usn':       function() { runPS('scripts\\clean-usn.ps1', ''); },
+    'echo-amcache':   function() { runPS('scripts\\clean-amcache.ps1', ''); },
+    'echo-shimcache': function() { runPS('scripts\\clean-shimcache.ps1', ''); },
+    'echo-srum':      function() { runPS('scripts\\clean-srum.ps1', ''); },
+    'echo-bam':       function() { runPS('scripts\\clean-bam.ps1', ''); },
+    'echo-timeline':  function() { runPS('scripts\\clean-timeline.ps1', ''); },
+    'echo-freespace': function() { runPS('scripts\\clean-freespace.ps1', ''); },
+    'detect-autoruns': function() { runPS('scripts\\clean-autoruns.ps1', ''); },
+    'detect-usb':      function() { runPS('scripts\\clean-usb.ps1', ''); },
+    'detect-errors':   function() { runPS('scripts\\clean-errors.ps1', ''); },
+    'lav-userassist':  function() { runPS('scripts\\clean-userassist.ps1', ''); },
+    'lav-muicache':    function() { runPS('scripts\\clean-muicache.ps1', ''); },
+    'lav-rdp':         function() { runPS('scripts\\clean-rdp.ps1', ''); },
+    'lav-comdlg':      function() { runPS('scripts\\clean-comdlg.ps1', ''); },
+    'lav-search':      function() { runPS('scripts\\clean-searchhistory.ps1', ''); },
+    'lav-notifications': function() { runPS('scripts\\clean-notifications.ps1', ''); },
+    'lav-pca':         function() { runPS('scripts\\clean-pca.ps1', ''); },
+    'lav-cloud':       function() { runPS('scripts\\clean-clouddrive.ps1', ''); },
+    'lav-shellbags':   function() { runPS('scripts\\clean-shellbags.ps1', ''); },
+    'stealth-self':   function() { runPS('scripts\\clean-self.ps1', ''); },
+    'repair':         function() { runPS('scripts\\repair-services.ps1', ''); }
+  };
+
+  var statusTimer = null;
+
+  function resetStatus() {
+    var statusEl = document.getElementById('ad-status');
+    statusEl.textContent = 'Bereit.';
+    statusEl.style.color = '#4a8a5a';
+  }
+
+  function runDirect(cmd) {
+    var statusEl = document.getElementById('ad-status');
+    statusEl.textContent = 'Laeuft...';
+    statusEl.style.color = '#e0c040';
+    clearTimeout(statusTimer);
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: 'ps-direct', cmd: cmd }));
+      statusTimer = setTimeout(function() { resetStatus(); }, 120000);
+    }
+  }
+
+  function runPS(script, args) {
+    var statusEl = document.getElementById('ad-status');
+    statusEl.textContent = 'Laeuft...';
+    statusEl.style.color = '#e0c040';
+    clearTimeout(statusTimer);
+
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({
+        type: 'powershell',
+        script: script,
+        args: args
+      }));
+      statusTimer = setTimeout(function() { resetStatus(); }, 120000);
+    } else {
+      statusTimer = setTimeout(function() {
+        statusEl.textContent = 'Fertig. (Browser-Modus)';
+        statusEl.style.color = '#60d080';
+        setTimeout(resetStatus, 3000);
+      }, 1500);
+    }
+  }
+
+  // ═══════════════════════════════════════
+  //  TAB SYSTEM
+  // ═══════════════════════════════════════
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.tab === name);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.classList.toggle('active', p.dataset.panel === name);
+    });
+  }
+
+  // ═══════════════════════════════════════
+  //  LOG
+  // ═══════════════════════════════════════
+  var logCount = 0;
+  var scanMode = false;
+  var scanBuffer = [];
+
+  function clearLog() {
+    var v = document.getElementById('log-view');
+    v.innerHTML = '<div class="log-empty">Log geleert.</div>';
+    logCount = 0;
+    document.getElementById('log-info').textContent = '0 Zeilen';
+  }
+
+  function appendLog(level, text) {
+    var v = document.getElementById('log-view');
+    if (logCount === 0) v.innerHTML = '';
+    var line = document.createElement('div');
+    line.className = 'log-line ' + level;
+    line.textContent = text;
+    v.appendChild(line);
+    logCount++;
+    document.getElementById('log-info').textContent = logCount + ' Zeilen';
+    if (document.getElementById('auto-scroll').checked) {
+      v.scrollTop = v.scrollHeight;
+    }
+  }
+
+  function appendSysLog(text) {
+    var v = document.getElementById('log-view');
+    if (logCount === 0) v.innerHTML = '';
+    var line = document.createElement('div');
+    line.className = 'log-line sys';
+    line.textContent = '▸ ' + text;
+    v.appendChild(line);
+    logCount++;
+    document.getElementById('log-info').textContent = logCount + ' Zeilen';
+    if (document.getElementById('auto-scroll').checked) {
+      v.scrollTop = v.scrollHeight;
+    }
+  }
+
+  // ═══════════════════════════════════════
+  //  SCANNER
+  // ═══════════════════════════════════════
+  function runScan() {
+    scanMode = true;
+    scanBuffer = [];
+    document.getElementById('scan-results').innerHTML = '<div class="log-empty">Scan laeuft &#x2014; kann einige Sekunden dauern...</div>';
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({
+        type: 'powershell',
+        script: 'scripts\\scan-pccheck.ps1',
+        args: ''
+      }));
+    }
+  }
+
+  function renderScanResults() {
+    var results = document.getElementById('scan-results');
+    var categories = {};
+    var currentCat = null;
+    var totalFound = 0;
+
+    for (var i = 0; i < scanBuffer.length; i++) {
+      var line = scanBuffer[i];
+      var catMatch = line.match(/^\[CAT\]\s*(.+?)\s*\|\s*(\d+)/);
+      if (catMatch) {
+        currentCat = catMatch[1];
+        var count = parseInt(catMatch[2]);
+        categories[currentCat] = { count: count, items: [] };
+        totalFound += count;
+        continue;
+      }
+      var itemMatch = line.match(/^\[ITEM\]\s*(.+)/);
+      if (itemMatch && currentCat) {
+        categories[currentCat].items.push(itemMatch[1]);
+      }
+    }
+
+    var html = '<div class="scan-summary">';
+    if (totalFound === 0) {
+      html += 'Alles sauber! Kein verdaechtiges Artefakt gefunden.';
+      html += '<span class="big clean">' + totalFound + '</span>';
+    } else {
+      html += 'Gefundene verdaechtige Artefakte:';
+      html += '<span class="big found">' + totalFound + '</span>';
+    }
+    html += '</div>';
+
+    var catNames = Object.keys(categories);
+    for (var j = 0; j < catNames.length; j++) {
+      var name = catNames[j];
+      var cat = categories[name];
+      var badge = cat.count === 0 ? 'clean' : 'found';
+      var badgeText = cat.count === 0 ? 'CLEAN' : cat.count + ' gefunden';
+      html += '<div class="scan-cat" data-idx="' + j + '">';
+      html += '<div class="scan-cat-head" onclick="toggleCat(this)">';
+      html += '<span class="scan-cat-name">' + name + '</span>';
+      html += '<span class="scan-badge ' + badge + '">' + badgeText + '</span>';
+      html += '</div>';
+      if (cat.items.length > 0) {
+        html += '<div class="scan-cat-body">';
+        for (var k = 0; k < cat.items.length; k++) {
+          html += '<div class="scan-item">' + escapeHtml(cat.items[k]) + '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    results.innerHTML = html;
+  }
+
+  function toggleCat(head) {
+    head.parentElement.classList.toggle('open');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function(c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  if (window.chrome && window.chrome.webview) {
+    window.chrome.webview.addEventListener('message', function(e) {
+      var data = JSON.parse(e.data);
+      var statusEl = document.getElementById('ad-status');
+      if (data.type === 'ps-done') {
+        clearTimeout(statusTimer);
+        statusEl.textContent = 'Bereinigung abgeschlossen.';
+        statusEl.style.color = '#60d080';
+        showToast('Clean abgeschlossen');
+        statusTimer = setTimeout(resetStatus, 4000);
+        appendSysLog('Fertig.');
+        if (scanMode) {
+          scanMode = false;
+          renderScanResults();
+        }
+      } else if (data.type === 'ps-error') {
+        clearTimeout(statusTimer);
+        statusEl.textContent = 'Fehler: ' + data.message;
+        statusEl.style.color = '#e07888';
+        statusTimer = setTimeout(resetStatus, 6000);
+        appendSysLog('Fehler: ' + data.message);
+        scanMode = false;
+      } else if (data.type === 'log') {
+        if (scanMode && (data.text.indexOf('[CAT]') === 0 || data.text.indexOf('[ITEM]') === 0)) {
+          scanBuffer.push(data.text);
+        } else {
+          appendLog(data.level || 'raw', data.text);
+        }
+      } else if (data.type === 'already-admin') {
+        showToast('Bereits als Admin gestartet');
+      } else if (data.type === 'admin-status') {
+        var leftDiv = document.querySelector('.status-bar').children[0];
+        if (data.admin === true) {
+          leftDiv.innerHTML = '<span class="status-dot" style="background:#f0c040;box-shadow:0 0 6px rgba(240,180,40,0.4);"></span>Admin';
+          document.getElementById('admin-btn').style.display = 'none';
+        } else {
+          leftDiv.innerHTML = '<span class="status-dot"></span>Standard';
+        }
+      }
+    });
+  }
+
+  function exec(actionId) {
+    if (scripts[actionId]) {
+      try {
+        scripts[actionId]();
+        showToast(actionId + ' gestartet');
+      } catch (e) {
+        showToast('Fehler: ' + e.message);
+      }
+    }
+  }
+
+  function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 2000);
+  }
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var id = cb.dataset.id;
+      var state = cb.checked;
+
+      if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.postMessage(JSON.stringify({
+          type: 'setting',
+          id: id,
+          value: state
+        }));
+      }
+
+      if (id === 'auto-clean') {
+        showToast(state ? 'Auto-Clean aktiviert' : 'Auto-Clean deaktiviert');
+      }
+    });
+  });
+
+  function requestAdmin() {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({
+        type: 'setting',
+        id: 'admin-mode',
+        value: true
+      }));
+      showToast('Starte mit Admin-Rechten neu...');
+    } else {
+      showToast('Nur in der EXE verfuegbar');
+    }
+  }
+</script>
+
+</body>
+</html>

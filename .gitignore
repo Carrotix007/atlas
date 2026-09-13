@@ -1,0 +1,35 @@
+# Build-Artefakte
+build/
+build-standalone/
+*.obj
+*.res
+*.exe.manifest
+
+# Dependencies (werden per setup.bat neu geladen)
+deps/
+
+# WebView2 Runtime-Data
+wv2data/
+
+# Log-Files
+atlas-cmd.log
+C:\atlas-cmd.log
+
+# IDE / Editor
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Backup / Temp
+*.bak
+*.tmp
+main.obj
+
+# Compiled Icon
+src/app.ico
