@@ -50,6 +50,28 @@ if (Test-IsAdmin) {
     Get-ChildItem -Path $prefetchDir -Filter "*ANTI*DETECT*.pf" -ErrorAction SilentlyContinue | ForEach-Object {
         try { $p = $_.FullName; Remove-Item $p -Force -Confirm:$false; Write-Detail $p; $cleared++ } catch {}
     }
+
+    # ATLAS-Neben-Prozesse: Programme die WAEHREND ATLAS-Session frisch getriggert wurden
+    # (Prefetch-Files der letzten 15 Minuten die von ATLAS-related Tools stammen)
+    $cutoff = (Get-Date).AddMinutes(-15)
+    $atlasRelated = @(
+        "MSEDGEWEBVIEW2", "MSEDGE", "IPCONFIG", "WEVTUTIL", "REG",
+        "RUNDLL32", "FSUTIL", "CIPHER", "NETSH", "SC",
+        "SCHTASKS", "TASKKILL", "GOOGLEDRIVEFS", "GOOGLEDRIVE",
+        "SEARCHFILTERHOST", "SEARCHPROTOCOLHOST", "SEARCHINDEXER",
+        "CONHOST", "CMD", "POWERSHELL", "PWSH"
+    )
+    Get-ChildItem -Path $prefetchDir -Filter "*.pf" -ErrorAction SilentlyContinue | Where-Object {
+        $_.LastWriteTime -gt $cutoff
+    } | ForEach-Object {
+        $pfName = $_.Name.ToUpper()
+        foreach ($tool in $atlasRelated) {
+            if ($pfName -like "$tool.EXE-*") {
+                try { $p = $_.FullName; Remove-Item $p -Force -Confirm:$false; Write-Detail "Neben-PF :: $($_.Name)"; $cleared++ } catch {}
+                break
+            }
+        }
+    }
 }
 
 # Registry: eigene Eintraege

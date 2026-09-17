@@ -99,8 +99,20 @@ try {
     Write-Host "  [Cleanup] Entferne ATLAS-Files..." -ForegroundColor Yellow
 
     if (Test-Path $tempDir) {
-        # clean-self mit expliziten EXE-Namen (Grandparent-Detection funktioniert
-        # nicht mehr weil ATLAS-Prozess schon beendet ist)
+        # 1) WebView2-Prozesse killen die noch File-Handles halten koennen
+        Get-Process -Name "msedgewebview2" -ErrorAction SilentlyContinue | Where-Object {
+            try { $_.Path -like "$tempDir\*" } catch { $false }
+        } | ForEach-Object { try { $_.Kill() } catch {} }
+        # Fallback: alle msedgewebview2 die zu unserer PID gehoerten
+        Get-Process -Name "msedgewebview2" -ErrorAction SilentlyContinue | ForEach-Object {
+            try {
+                $pth = $_.Path
+                if ($pth -and $pth -like "*$randomExeName*") { $_.Kill() }
+            } catch {}
+        }
+        Start-Sleep -Milliseconds 800
+
+        # 2) clean-self mit expliziten EXE-Namen
         $selfClean = Join-Path $tempDir "scripts\clean-self.ps1"
         if (Test-Path $selfClean) {
             try {
@@ -108,20 +120,36 @@ try {
             } catch {}
         }
 
-        # Manuell WebView2-UserData-Ordner loeschen (falls clean-self ihn nicht findet)
-        $wv2Path = Join-Path $env:LOCALAPPDATA "$randomExeName.WebView2"
-        if (Test-Path $wv2Path) {
-            try { Remove-Item $wv2Path -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+        # 3) WebView2-UserData-Ordner loeschen
+        $wv2Paths = @(
+            (Join-Path $env:LOCALAPPDATA "$randomExeName.WebView2"),
+            (Join-Path $env:LOCALAPPDATA "$($randomExeName -replace '\.exe$','').exe.WebView2")
+        )
+        foreach ($wv2 in $wv2Paths) {
+            if (Test-Path $wv2) {
+                try { Remove-Item $wv2 -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+            }
         }
 
-        # Multiple Attempts weil WebView2-Prozesse noch File-Handles halten koennen
-        for ($i = 0; $i -lt 5; $i++) {
+        # 4) Multiple Attempts mit progressive Backoff
+        for ($i = 0; $i -lt 10; $i++) {
             try {
                 Remove-Item $tempDir -Recurse -Force -ErrorAction Stop
                 break
             } catch {
-                Start-Sleep -Seconds 1
+                # Erneut msedgewebview2 killen falls neu aufgeploppt
+                Get-Process -Name "msedgewebview2" -ErrorAction SilentlyContinue | ForEach-Object {
+                    try {
+                        if ($_.Path -like "$tempDir\*") { $_.Kill() }
+                    } catch {}
+                }
+                Start-Sleep -Milliseconds (500 + ($i * 200))
             }
+        }
+
+        # 5) Letzter Versuch: cmd rd /s /q (nativer Windows-Delete, oft robuster)
+        if (Test-Path $tempDir) {
+            & cmd.exe /c "rd /s /q `"$tempDir`"" 2>&1 | Out-Null
         }
     }
 
@@ -133,6 +161,12 @@ try {
     }
 
     Write-Host ""
-    Write-Host "  Fertig. Fenster schliesst in 3 Sekunden..." -ForegroundColor DarkGray
-    Start-Sleep -Seconds 3
+    Write-Host "  Fertig. Fenster schliesst gleich..." -ForegroundColor DarkGray
+    Start-Sleep -Seconds 2
+
+    # Wenn als Script-File ausgefuehrt: Fenster schliessen
+    # Wenn via iwr | iex: PS-Session bleibt (Fenster gehoert dem User)
+    if ($MyInvocation.MyCommand.Path) {
+        try { Stop-Process -Id $PID -Force } catch { exit }
+    }
 }
