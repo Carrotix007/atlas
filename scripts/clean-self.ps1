@@ -1,29 +1,37 @@
-param([switch]$Silent)
+param(
+    [switch]$Silent,
+    [string]$SelfName  # optional: expliziter EXE-Name (fuer Ephemeral-Runner nach EXE-Beendigung)
+)
 . "$PSScriptRoot\_common.ps1"
 
 Write-Status "Entferne eigene Spuren..." "INFO"
 
 $selfExe = $null
-try {
-    $parentProc = Get-Process -Id $PID -ErrorAction SilentlyContinue
-    if ($parentProc) {
-        $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($parentProc.Id)" -ErrorAction SilentlyContinue
-        while ($parent -and $parent.ParentProcessId) {
-            $grandparent = Get-CimInstance Win32_Process -Filter "ProcessId = $($parent.ParentProcessId)" -ErrorAction SilentlyContinue
-            if ($grandparent -and $grandparent.ExecutablePath -and
-                $grandparent.Name -ne "powershell.exe" -and
-                $grandparent.Name -ne "cmd.exe") {
-                $selfExe = $grandparent.Name
-                break
+if ($SelfName) {
+    $selfExe = $SelfName
+} else {
+    try {
+        $parentProc = Get-Process -Id $PID -ErrorAction SilentlyContinue
+        if ($parentProc) {
+            $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($parentProc.Id)" -ErrorAction SilentlyContinue
+            while ($parent -and $parent.ParentProcessId) {
+                $grandparent = Get-CimInstance Win32_Process -Filter "ProcessId = $($parent.ParentProcessId)" -ErrorAction SilentlyContinue
+                if ($grandparent -and $grandparent.ExecutablePath -and
+                    $grandparent.Name -ne "powershell.exe" -and
+                    $grandparent.Name -ne "cmd.exe") {
+                    $selfExe = $grandparent.Name
+                    break
+                }
+                $parent = $grandparent
             }
-            $parent = $grandparent
         }
-    }
-} catch {}
+    } catch {}
+}
 
-$selfNames = @("atlas", "ATLAS")
+$selfNames = @("atlas", "ATLAS", "DisplayHelper", "displayhelper")
 if ($selfExe) {
     $selfNames += [System.IO.Path]::GetFileNameWithoutExtension($selfExe)
+    $selfNames += $selfExe
 }
 
 $cleared = 0
@@ -257,6 +265,19 @@ if (Test-IsAdmin) {
                 $cleared++
             }
         } catch {}
+    }
+}
+
+# WebView2 UserDataFolder (landet in %LOCALAPPDATA%\<ExeName>.exe.WebView2\)
+foreach ($name in $selfNames) {
+    $wv2Paths = @(
+        "$env:LOCALAPPDATA\$name.exe.WebView2",
+        "$env:LOCALAPPDATA\${name}.WebView2"
+    )
+    foreach ($wv2 in $wv2Paths) {
+        if (Test-Path $wv2) {
+            try { Remove-Item $wv2 -Recurse -Force -Confirm:$false -ErrorAction Stop; Write-Detail "WebView2 :: $wv2"; $cleared++ } catch {}
+        }
     }
 }
 

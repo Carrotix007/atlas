@@ -99,13 +99,19 @@ try {
     Write-Host "  [Cleanup] Entferne ATLAS-Files..." -ForegroundColor Yellow
 
     if (Test-Path $tempDir) {
-        # Letztes Mal clean-self ausfuehren um Traces zu bereinigen
-        # (Prefetch von der random-EXE, UserAssist etc.)
+        # clean-self mit expliziten EXE-Namen (Grandparent-Detection funktioniert
+        # nicht mehr weil ATLAS-Prozess schon beendet ist)
         $selfClean = Join-Path $tempDir "scripts\clean-self.ps1"
         if (Test-Path $selfClean) {
             try {
-                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $selfClean -Silent 2>&1 | Out-Null
+                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $selfClean -Silent -SelfName $randomExeName 2>&1 | Out-Null
             } catch {}
+        }
+
+        # Manuell WebView2-UserData-Ordner loeschen (falls clean-self ihn nicht findet)
+        $wv2Path = Join-Path $env:LOCALAPPDATA "$randomExeName.WebView2"
+        if (Test-Path $wv2Path) {
+            try { Remove-Item $wv2Path -Recurse -Force -ErrorAction SilentlyContinue } catch {}
         }
 
         # Multiple Attempts weil WebView2-Prozesse noch File-Handles halten koennen
