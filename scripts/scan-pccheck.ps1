@@ -609,6 +609,46 @@ Scan-Category "Cloud-Drive Logs (Google Drive / OneDrive / Dropbox)" {
     }
 }
 
+Scan-Category "Vulnerable Kernel Drivers (Ocean/Echo prueft darauf)" {
+    if (-not (Test-IsAdmin)) { return }
+    # Bekannte "vulnerable" oder cheat-related drivers
+    # PROCEXP152 = Process Explorer, KProcessHacker = ProcessHacker
+    # EchoDrv = Echo AC's eigener USB detector - kann als attack vector genutzt werden
+    $badDrivers = @(
+        "procexp152", "procexp", "processhacker", "kprocesshacker",
+        "kprocesshacker2", "echodrv", "capcom", "gdrv", "atillk",
+        "rtkio", "rtkiow10x64", "asupgrade", "dbutil"
+    )
+    try {
+        Get-CimInstance Win32_SystemDriver -ErrorAction SilentlyContinue | Where-Object {
+            $n = $_.Name.ToLower()
+            $bad = $false
+            foreach ($b in $badDrivers) { if ($n -like "*$b*") { $bad = $true; break } }
+            $bad
+        } | ForEach-Object {
+            "$($_.Name) ($($_.State)) :: $($_.PathName)"
+        }
+    } catch {}
+}
+
+Scan-Category "Scanner-Artefakte (Echo AC / Ocean Temp-Files)" {
+    $tempRoots = @($env:TEMP, "$env:LOCALAPPDATA\Temp")
+    foreach ($tr in $tempRoots) {
+        if (-not (Test-Path $tr)) { continue }
+        # Echo folders
+        Get-ChildItem -Path $tr -Directory -ErrorAction SilentlyContinue | Where-Object {
+            $_.Name -match '^echo\d+$'
+        } | ForEach-Object { "Echo AC :: $($_.FullName)" }
+
+        # Ocean spezifische Files
+        $oceanFiles = @("a3.exe", "xxstrings64-Ocean.exe", "ntfsDump", "temp.bin", "avast.db")
+        foreach ($of in $oceanFiles) {
+            Get-ChildItem -Path $tr -Filter $of -Recurse -ErrorAction SilentlyContinue -File |
+                Select-Object -First 3 | ForEach-Object { "Ocean-File :: $($_.FullName)" }
+        }
+    }
+}
+
 Scan-Category "Recycle Bin (verdaechtige Dateien)" {
     try {
         $shell = New-Object -ComObject Shell.Application

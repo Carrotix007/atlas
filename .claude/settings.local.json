@@ -12,7 +12,9 @@
       "Bash(cmd.exe //c \"dir D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\build-standalone\\\\\\\\DisplayHelper.exe\")",
       "Bash(findstr \"DisplayHelper\")",
       "Bash(cmd.exe //c \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\src-standalone\\\\\\\\bundle-scripts.ps1\")",
-      "Bash(cmd.exe //c \"rmdir /s /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\src-standalone 2>nul & rmdir /s /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\build-standalone 2>nul & del /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\build-standalone.bat 2>nul & echo done\")"
+      "Bash(cmd.exe //c \"rmdir /s /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\src-standalone 2>nul & rmdir /s /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\build-standalone 2>nul & del /q D:\\\\\\\\claude\\\\\\\\projekt1\\\\\\\\build-standalone.bat 2>nul & echo done\")",
+      "Bash(cmd.exe //c \"dir D:\\\\\\\\claude\\\\\\\\projekt /b /a\")",
+      "Bash(cmd.exe //c \"cd /d D:\\\\\\\\claude\\\\\\\\projekt && D:\\\\\\\\claude\\\\\\\\projekt\\\\\\\\build.bat\")"
     ]
   }
 }

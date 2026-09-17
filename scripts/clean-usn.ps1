@@ -2,7 +2,8 @@ param([switch]$Silent)
 . "$PSScriptRoot\_common.ps1"
 
 Write-Status "Bereinige USN Journal (soft mode)..." "INFO"
-Write-Status "Hinweis: USN ist append-only, echtes surgical geht nicht. Soft mode = verdraengen statt loeschen." "INFO"
+Write-Status "ACHTUNG (laut UC-Community): Scanner erkennen wenn USN Journal komplett geloescht wird!" "WARN"
+Write-Status "Soft mode = Groesse shrink + Noise, danach normal. Kein Full-Reset (waere Red Flag)." "INFO"
 
 if (-not (Test-IsAdmin)) {
     Write-Status "Braucht Admin fuer USN Journal." "WARN"

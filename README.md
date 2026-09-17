@@ -2,12 +2,23 @@
 
 Native Windows Anti-Forensik-Tool mit dark-purple GUI.
 
-## Installation
+## Nutzung
 
-Öffne PowerShell und führe aus:
+**Option A: Ephemeral (einmalig, verschwindet komplett danach)** — empfohlen für Panic-vor-PCCheck:
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/DEIN_USERNAME/atlas/main/install-atlas.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/Carrotix007/atlas/main/atlas-run.ps1 | iex
+```
+
+- Downloadet ATLAS in Temp-Ordner mit random Namen
+- Random Rename der EXE (Prefetch-Traces landen unter random Namen)
+- Startet als Admin
+- Beim Schließen: `clean-self` + Temp-Ordner komplett gelöscht
+
+**Option B: Permanent installieren** (mit Desktop-Shortcut):
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/Carrotix007/atlas/main/install-atlas.ps1 | iex
 ```
 
 Der Installer:

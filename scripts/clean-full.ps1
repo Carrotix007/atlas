@@ -28,6 +28,8 @@ param([switch]$Silent)
 & "$PSScriptRoot\clean-notifications.ps1" -Silent:$Silent
 & "$PSScriptRoot\clean-pca.ps1" -Silent:$Silent
 & "$PSScriptRoot\clean-clouddrive.ps1" -Silent:$Silent
+& "$PSScriptRoot\clean-scanner-artifacts.ps1" -Silent:$Silent
+& "$PSScriptRoot\clean-memory.ps1" -Silent:$Silent
 & "$PSScriptRoot\clean-self.ps1" -Silent:$Silent
 
 # Safety-Check: kritische Services wieder starten falls kaputt

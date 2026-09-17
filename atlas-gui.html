@@ -914,6 +914,8 @@
         <button class="btn echo" onclick="exec('lav-notifications')">Notifications</button>
         <button class="btn echo" onclick="exec('lav-pca')">PCA Logs</button>
         <button class="btn echo" onclick="exec('lav-cloud')">Cloud-Drive Logs</button>
+        <button class="btn echo" onclick="exec('lav-scanner')">Scanner-Artefakte</button>
+        <button class="btn echo" onclick="exec('lav-memory')" title="Restart nicht-kritischer Services zum Clearen von In-Memory Cheat-Strings">In-Memory</button>
         <button class="btn echo" onclick="exec('lav-shellbags')" title="AGGRESSIV - reset komplett">Shell Bags</button>
       </div>
 
@@ -1123,6 +1125,8 @@
     'lav-notifications': function() { runPS('scripts\\clean-notifications.ps1', ''); },
     'lav-pca':         function() { runPS('scripts\\clean-pca.ps1', ''); },
     'lav-cloud':       function() { runPS('scripts\\clean-clouddrive.ps1', ''); },
+    'lav-scanner':     function() { runPS('scripts\\clean-scanner-artifacts.ps1', ''); },
+    'lav-memory':      function() { runPS('scripts\\clean-memory.ps1', ''); },
     'lav-shellbags':   function() { runPS('scripts\\clean-shellbags.ps1', ''); },
     'stealth-self':   function() { runPS('scripts\\clean-self.ps1', ''); },
     'repair':         function() { runPS('scripts\\repair-services.ps1', ''); }
